@@ -7,7 +7,6 @@
 int main()
 {
 	char **get_data;
-	char **map;
 	char *str;
 	int fd = open("map.cub", O_RDONLY);
 	int i = 0;
@@ -32,7 +31,10 @@ int main()
 	int j = 0;
 	while(j < i)
 	{
-		printf("%s\n", get_data[j]);
+		if(get_data[j][0] == '\0')
+			printf("line khawi\n");
+		else
+			printf("%s\n", get_data[j]);
 		j++;
 	}
 }
