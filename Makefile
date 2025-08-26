@@ -1,6 +1,6 @@
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=address -g
 
 SRCS = ./gnl/get_next_line_utils.c ./gnl/get_next_line.c ./cub3d.c ./utils/ft_split.c\
 		

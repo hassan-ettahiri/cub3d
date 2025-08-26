@@ -5,11 +5,97 @@
 #include <stdio.h>
 #include "cub3d.h"
 
-// int check_valid_map(char **map_data)
-// {
-	
-// 	return 1;
-// }
+int check_valid_map_params(char **map_data)
+{
+	int i = 0;
+	int j;
+	int count = 0;
+	while(map_data[i])
+	{
+		j = 0;
+		while(map_data[i][j])
+		{
+			if(map_data[i][j] != '0' && map_data[i][j] != '1' && map_data[i][j] != ' '
+				&& map_data[i][j] != 'N' && map_data[i][j] != 'E' && map_data[i][j] != 'S'
+				&& map_data[i][j] != 'W')
+			{
+				return 0;
+			}
+			if(map_data[i][j] == 'N' || map_data[i][j] == 'E' || map_data[i][j] == 'S'
+				|| map_data[i][j] == 'W')
+			{
+				count++;
+			}
+			if(count > 1)
+			{
+				return 0;
+			}
+			j++;
+		}
+		i++;
+	}
+	return 1;
+}
+
+int check_valid_map_wall(char **map_data)
+{
+	int i = 0;
+	int j = 0;
+	while(map_data[i][j])
+	{
+		if(map_data[i][j] != '1' && map_data[i][j] != ' ')
+		{
+			return 0;
+		}
+		j++;
+	}
+	i++;
+	if(map_data[i] == NULL)
+	{
+		return 0;
+	}
+	while (map_data[i + 1])
+	{
+		j = 1;
+		while (map_data[i][j])
+		{
+			if (map_data[i][j] == '1' || map_data[i][j] == ' ')
+			{
+				j++;
+				continue;
+			}
+
+			if ((map_data[i][j] == '0' || map_data[i][j] == 'W' || map_data[i][j] == 'N'
+				|| map_data[i][j] == 'E' || map_data[i][j] == 'S'))
+			{
+				if (map_data[i][j + 1] == ' ' ||
+					map_data[i][j - 1] == ' ' ||
+					map_data[i + 1][j] == ' ' ||
+					map_data[i - 1][j] == ' ')
+				{
+					return 0;
+				}
+			}
+			j++;
+		}
+		i++;
+	}
+	if(map_data[i] == NULL)
+	{
+		return 0;
+	}
+	j = 0;
+	while(map_data[i][j])
+	{
+		if(map_data[i][j] != '1' && map_data[i][j] != ' ')
+		{
+			return 0;
+		}
+		j++;
+	}
+	return 1;
+}
+
 
 int main()
 {
@@ -30,15 +116,15 @@ int main()
 	i = 0;
 	while((str = get_next_line(fd)) != NULL)
 	{
-		get_data[i] = malloc (strlen(str));
+		get_data[i] = malloc (strlen(str) + 1);
 		strcpy(get_data[i], str);
-		if(strlen(str) > max_lines)
-			max_lines = strlen(str);
-		get_data[i][strlen(str) - 1] = '\0';
+		if(get_data[i][strlen(str) - 1] == '\n')
+			get_data[i][strlen(str) - 1] = '\0';
 		free(str);
 		i++;
 	}
 	get_data[i] = NULL;
+	close(fd);
 	int j = 0;
 	int no = 0;
 	int so = 0;
@@ -103,6 +189,16 @@ int main()
 		j++;
 	}
 	map.data = malloc((i - j + 1) * sizeof(char *));
+	int temp = j;
+	while (get_data[temp])
+	{
+		if(get_data[temp][0] != '\0')
+		{
+			if(strlen(get_data[temp]) > max_lines)
+				max_lines = strlen(get_data[temp]);
+		}
+		temp++;
+	}
 	int k = 0;
 	while (get_data[j])
 	{
@@ -121,9 +217,19 @@ int main()
 		}
 		j++;
 	}
+	map.data[k] = NULL;
 
-
-
+	if(check_valid_map_params(map.data) == 0)
+	{
+		printf("Error: Invalid map parameters.1\n");
+		return (1);
+	}
+	
+	if(check_valid_map_wall(map.data) == 0)
+	{
+		printf("Error: Invalid map parameters.2\n");
+		return (1);
+	}
 	printf("North Texture: %s\n", map.north_texture);
 	printf("South Texture: %s\n", map.south_texture);
 	printf("West Texture: %s\n", map.west_texture);
@@ -135,4 +241,5 @@ int main()
 	{
 		printf("%s\n", map.data[m]);
 	}
+
 }
